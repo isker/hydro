@@ -17,7 +17,7 @@ end
 
 function _hydro_pwd --on-variable PWD --on-variable hydro_ignored_git_paths --on-variable fish_prompt_pwd_dir_length
     if test "$fish_prompt_pwd_dir_length" = 0
-        set --global _hydro_pwd (path basename $PWD)
+        set --global _hydro_pwd $_hydro_newline(path basename $PWD)
         return
     end
 
@@ -32,15 +32,15 @@ function _hydro_pwd --on-variable PWD --on-variable hydro_ignored_git_paths --on
     set --local dir (string replace --regex -- "^$(string escape --style=regex -- ~)" '~' $PWD)
 
     if test -z $git_root
-        set --global _hydro_pwd (_hydro_pretty_path $dir)
+        set --global _hydro_pwd $_hydro_newline(_hydro_pretty_path $dir)
     else
         set --local git_dir (string replace --regex -- "^$(string escape --style=regex -- ~)" '~' $git_root)
         set --local after_git (string replace -- "$git_dir" "" "$dir")
 
         if test -z $after_git
-            set --global _hydro_pwd (_hydro_pretty_path $dir)
+            set --global _hydro_pwd $_hydro_newline(_hydro_pretty_path $dir)
         else
-            set --global _hydro_pwd "$(_hydro_pretty_path $git_dir)$(_hydro_pretty_path $after_git)"
+            set --global _hydro_pwd "$_hydro_newline$(_hydro_pretty_path $git_dir)$(_hydro_pretty_path $after_git)"
         end
     end
 end
@@ -51,7 +51,7 @@ function _hydro_postexec --on-event fish_postexec
 
     for code in $last_status
         if test $code -ne 0
-            set --global _hydro_status "$_hydro_color_error| "(echo $last_status)" $_hydro_newline$_hydro_color_prompt$_hydro_color_error$hydro_symbol_prompt"
+            set --global _hydro_status "$_hydro_color_error| "(echo $last_status)" $_hydro_newline$_hydro_color_prompt$hydro_symbol_prompt"
             break
         end
     end
@@ -143,9 +143,10 @@ function hydro_multiline --on-variable hydro_multiline
 end && hydro_multiline
 
 set --query hydro_color_error || set --global hydro_color_error $fish_color_error
-set --query hydro_symbol_prompt || set --global hydro_symbol_prompt ❱
+set --query hydro_symbol_prompt || set --global hydro_symbol_prompt λ
 set --query hydro_symbol_git_dirty || set --global hydro_symbol_git_dirty •
 set --query hydro_symbol_git_ahead || set --global hydro_symbol_git_ahead ↑
 set --query hydro_symbol_git_behind || set --global hydro_symbol_git_behind ↓
-set --query hydro_multiline || set --global hydro_multiline false
+set --query hydro_multiline || set --global hydro_multiline true
 set --query hydro_cmd_duration_threshold || set --global hydro_cmd_duration_threshold 1000
+set --query hydro_color_prompt || set --global hydro_color_prompt --bold white
